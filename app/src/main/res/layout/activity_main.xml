@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:padding="16dp"
+        tools:context=".MainActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_layout_topic_subscribe"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <TextView
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="새로운 캠페인 알림 받기 "/>
+
+        <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_new_campaign_subscribe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <NumberPicker
+            android:id="@+id/numberPickerA"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_new_campaign"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+    <RadioGroup
+            android:id="@+id/radioGroup_point_range"
+            app:layout_constraintTop_toBottomOf="@id/constraint_layout_topic_subscribe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <RadioButton
+                android:text="50 포인트 이상"
+                android:checked="true"
+                android:buttonTint="@color/colorPrimary"
+                android:textColor="@color/common_google_signin_btn_text_light_default"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/radioButton" android:layout_weight="1"/>
+        <RadioButton
+                android:text="100 포인트 이상"
+                android:buttonTint="@color/colorPrimary"
+                android:textColor="@color/common_google_signin_btn_text_light_default"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/radioButton2" android:layout_weight="1"/>
+        <RadioButton
+                android:text="200 포인트 이상"
+                android:buttonTint="@color/colorPrimary"
+                android:textColor="@color/common_google_signin_btn_text_light_default"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/radioButton3" android:layout_weight="1"/>
+        <RadioButton
+                android:text="1,000 포인트 이상"
+                android:buttonTint="@color/colorPrimary"
+                android:textColor="@color/common_google_signin_btn_text_light_default"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/radioButton4" android:layout_weight="1"/>
+    </RadioGroup>
+
+    <Button
+            app:layout_constraintTop_toBottomOf="@id/radioGroup_point_range"
+            android:layout_marginTop="30dp"
+            android:id="@+id/btn_plumboard_news"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="send plumboard news"/>
+
+    <Button
+            android:id="@+id/btn_new_campaign"
+            app:layout_constraintTop_toBottomOf="@id/btn_plumboard_news"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="send new campaign"/>
+
+    <LinearLayout
+            android:id="@+id/aaa"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:orientation="vertical">
+
+        <Button
+                android:id="@+id/btn_delete_btn_new_campaign"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Delete New Campaign Channel"/>
+
+        <Button
+                android:id="@+id/btn_setting_plumboard_news"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="plumboard news channel Setting"/>
+
+        <Button
+                android:id="@+id/btn_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Setting"/>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
