@@ -9,18 +9,16 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.yes.yesnotificatonexample.manager.PlumFcmTopicManager.Companion.FcmTopicType
+import com.yes.yesnotificatonexample.manager.YesFcmTopicManager.Companion.FcmTopicType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.yes.yesnotificatonexample.MainActivity
 import com.yes.yesnotificatonexample.MyWorker
 import com.yes.yesnotificatonexample.R
 import com.yes.yesnotificatonexample.SharedPreferencesHelper
-import com.yes.yesnotificatonexample.manager.PlumFcmTopicManager
-import com.yes.yesnotificatonexample.manager.PlumNotificationManager
+import com.yes.yesnotificatonexample.manager.YesNotificationManager
 
 /**
  * NOTE: There can only be one service in each app that receives FCM messages. If multiple
@@ -45,18 +43,6 @@ class YesMessagingService : FirebaseMessagingService() {
         // and data payloads are treated as notification messages. The Firebase console always sends notification
         // messages. For more see: https://firebase.google.com/docs/cloud-messaging/concept-options
         // [END_EXCLUDE]
-            FirebaseFirestore.getInstance()
-                .collection("restaurants").document("C5hRPi1ltUXxa8rmN0g1")
-                .get()//내정보에서 나의 나이,지역,성별 가져오기
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        task.result?.let {snapshot ->
-                            val avgRating = snapshot["avgRating"] as Number
-                            val category = snapshot["category"] as String
-                        }
-                    }
-                }
-
         remoteMessage.from?.let { from ->
             val topicType = sliceTopicString(from)?.let {topicString ->
                     FcmTopicType.valueOf(topicString)
@@ -116,36 +102,12 @@ class YesMessagingService : FirebaseMessagingService() {
      */
     private fun handleNow(topicType: FcmTopicType, data:Map<String, String>) {
         when (topicType) {
-            PlumFcmTopicManager.Companion.FcmTopicType.NEW_CAMPAIGN -> processTopicNewCampaign(data)
+            FcmTopicType.TOPIC_ONE -> processTopicOne(data)
             else -> {}
         }
     }
 
-    private fun processTopicPlumboardNotice(data: Map<String, String>) {
-
-    }
-
-    private fun processTopicNewCampaign(data: Map<String, String>) {
-        val point = data["point"]?.let {
-            Integer.parseInt(it)
-        } ?: 0
-
-        val abovePoint = SharedPreferencesHelper.get(this, "abovePoint", 50)
-        if (abovePoint is Int) {
-            if (point > abovePoint) {
-                if (data.containsKey("campaign_name") && data.containsKey("max")) {
-                    val name =  data["campaign_name"]
-                    val max =  data["max"]
-                    sendNotification(point.toString() + "포인트를 획득할 수 있는 캠페인 ["+ name + "] 을 지금 바로 참가해보세요! 최대 " + max + "명까지만 참여 가능합니다", PlumNotificationManager.Companion.ChannelType.NEW_CAMPAIGN)
-                }
-            }
-        } else {
-            if (data.containsKey("campaign_name") && data.containsKey("max")) {
-                val name =  data["campaign_name"]
-                val max =  data["max"]
-                sendNotification(point.toString() + "포인트를 획득할 수 있는 캠페인 ["+ name + "] 을 지금 바로 참가해보세요! 최대 " + max + "명까지만 참여 가능합니다", PlumNotificationManager.Companion.ChannelType.NEW_CAMPAIGN)
-            }
-        }
+    private fun processTopicOne(data: Map<String, String>) {
     }
 
     /**
@@ -158,41 +120,6 @@ class YesMessagingService : FirebaseMessagingService() {
      */
     private fun sendRegistrationToServer(token: String?) {
         // TODO: Implement this method to send token to your app server.
-    }
-
-    /**
-     * Create and show a simple notification containing the received FCM message.
-     *
-     * @param messageBody FCM message body received.
-     */
-    private fun sendNotification(messageBody: String, channelType: PlumNotificationManager.Companion.ChannelType) {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT)
-
-        val channelId = channelType.id
-        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.ic_stat_ic_notification)
-                .setContentTitle(getString(R.string.fcm_message))
-                .setStyle(NotificationCompat.BigTextStyle().bigText(messageBody))
-                //.setContentText(messageBody)
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent)
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // Since android Oreo notification channel is needed.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId,
-                    "Channel human readable title",
-                    NotificationManager.IMPORTANCE_DEFAULT)
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
     }
 
     companion object {

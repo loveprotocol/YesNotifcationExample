@@ -15,10 +15,10 @@ import com.yes.yesnotificatonexample.R
 /**
  * Notification 알림 메시지 및 설정 관련 기능 클래스
  */
-class PlumNotificationManager {
+class YesNotificationManager {
     companion object {
         enum class ChannelType(val id: String, val title: String, val description: String ) {
-            NEW_CAMPAIGN("channel_new_campaign", "캠페인 알림", "새로운 캠페인 알림 수신 여부를 선택합니다"),
+            NEW_MESSAGE("new_message", "새 메시지 알림", "새로운 메시지 알림 수신 여부를 선택합니다"),
         }
 
         /**
@@ -28,11 +28,11 @@ class PlumNotificationManager {
         @JvmStatic
         fun createChannel(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channelNewCampaign = NotificationChannel(Companion.ChannelType.NEW_CAMPAIGN.id, Companion.ChannelType.NEW_CAMPAIGN.title, NotificationManager.IMPORTANCE_DEFAULT)
-                channelNewCampaign.description = Companion.ChannelType.NEW_CAMPAIGN.description
-                channelNewCampaign.lightColor = Color.BLUE
-                channelNewCampaign.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                NotificationManagerCompat.from(context).createNotificationChannel(channelNewCampaign)
+                val channelNewMessage = NotificationChannel(Companion.ChannelType.NEW_MESSAGE.id, Companion.ChannelType.NEW_MESSAGE.title, NotificationManager.IMPORTANCE_DEFAULT)
+                channelNewMessage.description = Companion.ChannelType.NEW_MESSAGE.description
+                channelNewMessage.lightColor = Color.BLUE
+                channelNewMessage.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                NotificationManagerCompat.from(context).createNotificationChannel(channelNewMessage)
             }
         }
 
@@ -55,7 +55,7 @@ class PlumNotificationManager {
          * @param channelType 알림 허용 여부를 확인할 채널의 타입
          */
         @JvmStatic
-        fun isNotificationChannelEnabled(context: Context, channelType: ChannelType) : Boolean {
+        fun isEnabledNotificationChannel(context: Context, channelType: ChannelType) : Boolean {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {    // 전체 알림 설정 우선 확인
                     NotificationManagerCompat.from(context).getNotificationChannel(channelType.id)?.let { channel ->

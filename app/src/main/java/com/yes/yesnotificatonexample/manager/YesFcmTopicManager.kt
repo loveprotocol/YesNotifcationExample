@@ -4,14 +4,14 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.messaging.FirebaseMessaging
-import com.yes.yesnotificatonexample.manager.PlumNotificationManager.Companion.ChannelType
+import com.yes.yesnotificatonexample.manager.YesNotificationManager.Companion.ChannelType
 import com.yes.yesnotificatonexample.Resource
 import com.yes.yesnotificatonexample.SharedPreferencesHelper
 
 /**
  * FCM Topic 관련 기능을 모아놓은 클래스
  */
-class PlumFcmTopicManager {
+class YesFcmTopicManager {
     companion object {
         /**
          * Fcm Topic Type 정의
@@ -19,8 +19,8 @@ class PlumFcmTopicManager {
         enum class FcmTopicType(val spKeyName: String /* SharedPreference Key name */,
                                             val channelType: ChannelType) /* Topic이 속하는 Channel Type*/
         {
-            NONE("subscribe_topic_none", ChannelType.NEW_CAMPAIGN),
-            NEW_CAMPAIGN("subscribe_topic_new_campaign", ChannelType.NEW_CAMPAIGN),
+            NONE("subscribe_topic_none", ChannelType.NEW_MESSAGE),
+            TOPIC_ONE("subscribe_topic_one", ChannelType.NEW_MESSAGE),
         }
 
         /**
@@ -63,6 +63,7 @@ class PlumFcmTopicManager {
 
             FirebaseMessaging.getInstance().subscribeToTopic(topicType.name)
                 .addOnSuccessListener {
+                    // 구독 여부를 SharedPreference에 저장
                     SharedPreferencesHelper.put(context, topicType.spKeyName, true)
                     isSubscribe.value = Resource(true)
                 }
