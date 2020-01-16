@@ -18,9 +18,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, CompoundButton.O
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        /* 알림 설정값 불러오기 */
-        val isSubscribed = YesFcmTopicManager.isSubscribedTopic(this, YesFcmTopicManager.Companion.FcmTopicType.TOPIC_ONE)
-        setSwitchButtonChecked(isSubscribed)
+
+        when (YesFcmTopicManager.isInitializedTopic(this, FcmTopicType.TOPIC_ONE)) {
+            true -> {   /* 구독 여부 설정값 불러오기 */
+                val isSubscribed = YesFcmTopicManager.isSubscribedTopic(
+                    this,
+                    YesFcmTopicManager.Companion.FcmTopicType.TOPIC_ONE
+                )
+                setSubscribeSwitchChecked(isSubscribed)
+            }
+            false -> { /* 구독 초기화 */
+                YesFcmTopicManager.subscribe(this, FcmTopicType.TOPIC_ONE).observe(this, subscribeObserver)
+            }
+        }
 
         btn_new_message_noti_send.setOnClickListener(this)
         btn_open_channel_setting.setOnClickListener(this)
@@ -28,19 +38,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, CompoundButton.O
         btn_delete_new_message_channel.setOnClickListener(this)
         switch_new_message_subscribe.setOnCheckedChangeListener(this)
 
-        // 구독 초기화
-        if (!YesFcmTopicManager.isInitializedTopic(this, FcmTopicType.TOPIC_ONE)) {
-            YesFcmTopicManager.subscribe(this, FcmTopicType.TOPIC_ONE)
-        }
-
-        // 앱 알림 Android 설정이 꺼져있는 경우, 알림 활성화 요청 다이얼로그 팝업
+        // 앱 알림 Android 설정이 꺼져 있는 경우, 알림 활성화 요청 다이얼로그 팝업
         if (!YesNotificationManager.isEnabledNotificationChannel(this, ChannelType.NEW_MESSAGE)) {
             YesNotificationManager.showAppSettingDialog(this)
         }
-    }
-
-    private fun setSwitchButtonChecked(checked: Boolean) {
-        switch_new_message_subscribe.isChecked = checked
     }
 
     override fun onClick(v: View?) {
@@ -64,20 +65,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, CompoundButton.O
             when (isChecked) {
                 true -> {
                     if (YesNotificationManager.isEnabledNotificationChannel(this, ChannelType.NEW_MESSAGE)) {
-                        YesFcmTopicManager.subscribe(
-                            this, FcmTopicType.TOPIC_ONE
-                        ).observe(this, Observer { resources ->
-                            if (!resources.isSuccessful) {
-                                Toast.makeText(
-                                    this,
-                                    "새로운 메시지 알림 설정에 실패했습니다\n\n" + resources.error().message,
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                switch_new_message_subscribe.setOnCheckedChangeListener(null)
-                                switch_new_message_subscribe.isChecked = false
-                                switch_new_message_subscribe.setOnCheckedChangeListener(this)
-                            }
-                        })
+                        YesFcmTopicManager.subscribe(this, FcmTopicType.TOPIC_ONE).observe(this, subscribeObserver)
                     } else {
                         YesNotificationManager.showAppSettingDialog(this)
                     }
@@ -94,5 +82,31 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, CompoundButton.O
             }
         }
     }
+
+    /**
+     * 구독 처리 Observer
+     */
+    private val subscribeObserver = Observer<Resource<Boolean>> { resources ->
+        if (!resources.isSuccessful) {
+            Toast.makeText(
+                this,
+                "새로운 메시지 알림 설정에 실패했습니다\n\n" + resources.error().message,
+                Toast.LENGTH_SHORT
+            ).show()
+            switch_new_message_subscribe.setOnCheckedChangeListener(null)
+            switch_new_message_subscribe.isChecked = false
+            switch_new_message_subscribe.setOnCheckedChangeListener(this)
+        }
+    }
+
+    /**
+     * 구독 버튼 Checked 설정
+     * @param checked 구독 또는 구독 취소
+     */
+    private fun setSubscribeSwitchChecked(checked: Boolean) {
+        switch_new_message_subscribe.isChecked = checked
+    }
+
+
 }
 

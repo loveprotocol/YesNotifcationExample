@@ -107,7 +107,14 @@ class YesMessagingService : FirebaseMessagingService() {
         }
     }
 
+    /**
+     * TopicOne Data Message Format
+     *  [title]
+     *  [body]
+     *  [timeStamp]
+     */
     private fun processTopicOne(data: Map<String, String>) {
+        data.["title"]
     }
 
     /**
